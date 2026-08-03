@@ -1,618 +1,294 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
-      <style>
-
-:root {
-  --bg: #0b1220;
-  --card: #151f32;
-  --card-2: #1b2941;
-  --text: #f8fafc;
-  --muted: #9fb0c8;
-  --accent: #22c55e;
-  --accent-dark: #16a34a;
-  --line: rgba(255,255,255,.08);
-  --danger: #ef4444;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at top, rgba(34,197,94,.16), transparent 28%),
-    var(--bg);
-  color: var(--text);
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-button { font: inherit; }
-
-.app {
-  width: min(100%, 520px);
-  margin: 0 auto;
-  padding: max(20px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
-}
-
-.topbar, .section-head, .progress-info, .workout-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.topbar { margin-bottom: 24px; }
-
-h1, h2, h3, p { margin-top: 0; }
-h1 { font-size: 1.55rem; margin-bottom: 0; }
-h2 { font-size: 1.7rem; line-height: 1.15; }
-h3 { font-size: 1rem; margin-bottom: 14px; }
-
-.eyebrow {
-  color: var(--accent);
-  letter-spacing: .14em;
-  font-size: .72rem;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-
-.screen { display: none; }
-.screen.active { display: block; animation: fade .22s ease; }
-
-@keyframes fade {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: none; }
-}
-
-.hero-card, .card, .exercise-card, .finish-card, .history-item, .workout-item {
-  background: linear-gradient(180deg, var(--card-2), var(--card));
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  box-shadow: 0 16px 40px rgba(0,0,0,.22);
-}
-
-.hero-card {
-  padding: 24px;
-  margin-bottom: 16px;
-}
-.hero-card p { color: var(--muted); margin-bottom: 0; }
-.badge {
-  display: inline-block;
-  background: rgba(34,197,94,.12);
-  color: #86efac;
-  border: 1px solid rgba(34,197,94,.25);
-  padding: 7px 10px;
-  border-radius: 999px;
-  font-size: .78rem;
-  margin-bottom: 16px;
-}
-
-.card {
-  padding: 18px;
-  margin-bottom: 14px;
-}
-
-.options {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.option, .secondary-btn, .back-btn, .icon-btn {
-  border: 1px solid var(--line);
-  color: var(--text);
-  background: rgba(255,255,255,.04);
-  border-radius: 14px;
-  cursor: pointer;
-}
-
-.option {
-  padding: 12px 8px;
-  font-size: .84rem;
-}
-
-.option.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #052e16;
-  font-weight: 800;
-}
-
-.primary-btn, .danger-btn {
-  width: 100%;
-  border: 0;
-  border-radius: 16px;
-  padding: 16px;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.primary-btn {
-  background: linear-gradient(180deg, #34d399, var(--accent-dark));
-  color: #052e16;
-  margin-top: 10px;
-}
-
-.danger-btn {
-  color: white;
-  background: rgba(239,68,68,.2);
-  border: 1px solid rgba(239,68,68,.35);
-  margin-top: 16px;
-}
-
-.icon-btn, .back-btn {
-  width: 44px;
-  height: 44px;
-  font-size: 1.15rem;
-}
-
-.section-head {
-  justify-content: flex-start;
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.section-head h2 { margin-bottom: 0; }
-
-.workout-list, .history-list {
-  display: grid;
-  gap: 10px;
-}
-
-.workout-item {
-  padding: 16px;
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  align-items: center;
-  gap: 12px;
-}
-
-.workout-item .emoji { font-size: 1.7rem; }
-.workout-item h3 { margin: 0 0 4px; }
-.workout-item p { margin: 0; color: var(--muted); font-size: .88rem; }
-.workout-item strong { color: #86efac; font-size: .9rem; }
-
-.progress-wrap { margin: 10px 0 28px; }
-.progress-info { color: var(--muted); font-size: .85rem; margin-bottom: 8px; }
-.progress-bar {
-  height: 10px;
-  border-radius: 99px;
-  overflow: hidden;
-  background: rgba(255,255,255,.07);
-}
-#progressFill {
-  height: 100%;
-  width: 0;
-  background: var(--accent);
-  transition: width .25s ease;
-}
-
-.exercise-card {
-  min-height: 430px;
-  padding: 28px 22px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  justify-content: center;
-}
-
-.exercise-emoji { font-size: 5rem; margin-bottom: 20px; }
-.exercise-card h2 { font-size: 2rem; margin-bottom: 12px; }
-.exercise-card > p:not(.eyebrow):not(#timerUnit) {
-  color: var(--muted);
-  max-width: 330px;
-  min-height: 48px;
-}
-.timer {
-  font-size: 5.2rem;
-  line-height: 1;
-  font-weight: 900;
-  margin-top: 22px;
-}
-#timerUnit { color: var(--muted); }
-
-.workout-actions { gap: 12px; margin-top: 14px; }
-.secondary-btn { flex: 1; padding: 14px; }
-
-.finish-card { text-align: center; padding: 34px 22px; }
-.finish-icon { font-size: 4.5rem; margin-bottom: 14px; }
-.finish-card > p:not(.eyebrow) { color: var(--muted); }
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 26px 0;
-}
-.stats div {
-  background: rgba(255,255,255,.04);
-  border-radius: 14px;
-  padding: 14px 8px;
-}
-.stats strong, .stats span { display: block; }
-.stats strong { font-size: 1.15rem; margin-bottom: 5px; }
-.stats span { color: var(--muted); font-size: .75rem; }
-
-.history-item { padding: 16px; }
-.history-item .row { display: flex; justify-content: space-between; gap: 12px; }
-.history-item h3 { margin-bottom: 5px; }
-.history-item p { color: var(--muted); margin-bottom: 0; font-size: .85rem; }
-.empty {
-  color: var(--muted);
-  text-align: center;
-  padding: 30px 12px;
-}
-
-@media (max-width: 380px) {
-  .options { grid-template-columns: 1fr; }
-  .exercise-card { min-height: 390px; }
-}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050b14">
   <title>Calistenia em Casa</title>
+  <style>
+    :root{
+      --bg:#050b14;--panel:#0c1624;--panel2:#111d2e;--line:#26364b;
+      --text:#f7f9fc;--muted:#9cadc5;--green:#35d878;--green2:#20b95e;
+      --danger:#ff5b68;--shadow:0 18px 45px rgba(0,0,0,.34)
+    }
+    *{box-sizing:border-box}
+    html{background:var(--bg)}
+    body{
+      margin:0;min-height:100vh;color:var(--text);
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at 50% -20%,rgba(53,216,120,.11),transparent 35%),var(--bg)
+    }
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .app{width:min(100%,540px);margin:auto;min-height:100vh;padding:max(18px,env(safe-area-inset-top)) 18px calc(94px + env(safe-area-inset-bottom))}
+    .screen{display:none}.screen.active{display:block;animation:fade .2s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    h1,h2,h3,p{margin-top:0}.muted{color:var(--muted)}
+    .eyebrow{font-size:.72rem;letter-spacing:.14em;color:var(--green);font-weight:900;margin-bottom:6px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+    .header-center{text-align:center;flex:1}.header-center h1,.header-center h2{margin:0}
+    .header h1{font-size:1.65rem}.header h2{font-size:1.45rem}
+    .icon-btn,.nav-button,.chip,.outline-btn,.workout-action{
+      border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--text)
+    }
+    .icon-btn{width:48px;height:48px;border-radius:16px;font-size:1.3rem}
+    .home-btn{width:auto;padding:0 14px;display:flex;align-items:center;gap:8px;color:var(--green);font-weight:800}
+    .hero,.card,.workout-card,.exercise-panel,.finish-card,.history-item,.profile-card{
+      background:linear-gradient(145deg,var(--panel2),var(--panel));
+      border:1px solid var(--line);border-radius:23px;box-shadow:var(--shadow)
+    }
+    .hero{padding:24px;margin-bottom:18px}
+    .hero h2{font-size:1.85rem;line-height:1.12;margin-bottom:10px}
+    .hero p{margin:0}
+    .hero-badge{display:inline-block;padding:7px 11px;border-radius:999px;border:1px solid rgba(53,216,120,.35);color:var(--green);background:rgba(53,216,120,.08);font-size:.78rem;font-weight:800;margin-bottom:15px}
+    .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+    .quick-card{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025);color:var(--text);padding:16px;text-align:left}
+    .quick-card strong,.quick-card span{display:block}.quick-card strong{margin:8px 0 4px}.quick-card span{color:var(--muted);font-size:.82rem}
+    .section-title{display:flex;justify-content:space-between;align-items:end;margin:24px 2px 12px}
+    .section-title h2{margin:0;font-size:1.25rem}.section-title p{margin:0;color:var(--muted);font-size:.85rem}
+    .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+    .chip{white-space:nowrap;padding:10px 14px;border-radius:13px}
+    .chip.active{border-color:var(--green);color:var(--green);background:rgba(53,216,120,.08)}
+    .search-box{position:relative;margin-bottom:14px}.search-box input{width:100%;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:16px;padding:14px 46px 14px 15px;outline:none}.search-box span{position:absolute;right:16px;top:13px}
+    .workout-list{display:grid;gap:13px}
+    .workout-card{padding:14px;display:grid;grid-template-columns:126px 1fr 20px;gap:14px;align-items:center;text-align:left;color:var(--text);width:100%}
+    .poster{height:128px;border:1px solid #34455b;border-radius:15px;padding:9px;background:#05080c;overflow:hidden}
+    .poster-title{text-align:center;color:var(--green);font-size:.72rem;font-weight:1000;line-height:1.05;margin-bottom:7px}
+    .poster-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;height:88px}
+    .poster-grid div{border:1px solid rgba(255,255,255,.09);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;background:rgba(255,255,255,.025)}
+    .workout-info h3{font-size:1.08rem;margin-bottom:8px}.workout-info p{font-size:.85rem;margin-bottom:8px;color:var(--muted)}
+    .tag{display:inline-block;border:1px solid rgba(53,216,120,.35);color:var(--green);border-radius:7px;padding:4px 7px;font-size:.68rem;font-weight:900;margin-bottom:9px}
+    .meta{display:flex;gap:13px;flex-wrap:wrap;color:var(--muted);font-size:.78rem}
+    .arrow{font-size:1.65rem}
+    .detail-hero{padding:18px;margin-bottom:15px}
+    .detail-hero .poster{height:190px}.detail-hero .poster-grid{grid-template-columns:repeat(4,1fr);height:132px}.detail-hero h2{margin:16px 0 8px}
+    .exercise-list{display:grid;gap:10px}.exercise-row{display:grid;grid-template-columns:50px 1fr auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:13px}
+    .exercise-illustration{width:50px;height:50px;border-radius:13px;background:rgba(53,216,120,.08);display:flex;align-items:center;justify-content:center;font-size:1.7rem}
+    .exercise-row h3{font-size:.95rem;margin:0 0 4px}.exercise-row p{font-size:.78rem;color:var(--muted);margin:0}.exercise-row strong{color:var(--green);font-size:.82rem}
+    .primary{width:100%;border:0;border-radius:17px;background:linear-gradient(180deg,var(--green),var(--green2));color:#042311;padding:16px;font-weight:1000;margin-top:16px}
+    .progress-head{display:flex;justify-content:space-between;color:var(--muted);margin:12px 2px 8px}.progress{height:10px;border-radius:99px;background:#172332;overflow:hidden;margin-bottom:24px}.progress div{height:100%;background:var(--green);transition:.25s}
+    .exercise-panel{min-height:430px;padding:28px 20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+    .big-icon{width:108px;height:108px;border-radius:28px;background:rgba(53,216,120,.08);border:1px solid rgba(53,216,120,.38);display:flex;align-items:center;justify-content:center;font-size:3.8rem;margin-bottom:24px}
+    .exercise-panel h2{font-size:2.05rem;line-height:1.15;margin-bottom:12px}.exercise-panel .description{color:var(--muted);max-width:350px;min-height:44px}
+    .timer{font-size:6rem;line-height:1;font-weight:1000;margin-top:22px}.timer-label{color:var(--muted);font-size:1.15rem}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.workout-action{padding:15px;border-radius:17px;font-weight:800}
+    .restart{width:100%;margin-top:10px;border-color:rgba(53,216,120,.55);color:var(--green)}
+    .finish-card{text-align:center;padding:36px 22px}.finish-icon{font-size:4.7rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:24px 0}.stats div{border-radius:14px;padding:13px 5px;background:rgba(255,255,255,.035)}.stats strong,.stats span{display:block}.stats span{font-size:.72rem;color:var(--muted);margin-top:5px}
+    .history-list{display:grid;gap:10px}.history-item{padding:15px}.history-item .row{display:flex;justify-content:space-between;gap:10px}.history-item h3{font-size:.95rem;margin-bottom:5px}.history-item p{margin:0;color:var(--muted);font-size:.8rem}
+    .empty{text-align:center;color:var(--muted);padding:45px 15px}
+    .profile-card{padding:24px;text-align:center}.avatar{width:82px;height:82px;border-radius:50%;margin:0 auto 14px;background:rgba(53,216,120,.1);display:flex;align-items:center;justify-content:center;font-size:2.7rem}
+    .bottom-nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,540px);padding:10px 15px calc(10px + env(safe-area-inset-bottom));background:rgba(5,11,20,.94);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:20}
+    .nav-button{border:0;background:transparent;padding:5px 3px;color:var(--muted);font-size:.72rem}.nav-button span{font-size:1.45rem;display:block;margin-bottom:3px}.nav-button.active{color:var(--green)}
+    .hidden-nav .bottom-nav{display:none}
+    @media(max-width:390px){.workout-card{grid-template-columns:105px 1fr 15px;gap:9px}.poster{height:112px}.poster-grid{height:74px}.workout-info p{display:none}.app{padding-left:13px;padding-right:13px}.exercise-panel{min-height:400px}}
+  </style>
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">TREINO SIMPLES</p>
-        <h1>Calistenia em Casa</h1>
-      </div>
-      <button id="historyBtn" class="icon-btn" aria-label="Ver histórico">📊</button>
+<div class="app" id="app">
+  <section class="screen active" id="homeScreen">
+    <header class="header">
+      <div><p class="eyebrow">TREINO SIMPLES</p><h1>Calistenia em Casa</h1></div>
+      <button class="icon-btn" onclick="goTo('historyScreen','history')">📊</button>
     </header>
-
-    <section id="setupScreen" class="screen active">
-      <div class="hero-card">
-        <span class="badge">Sem equipamentos</span>
-        <h2>Monte seu treino em poucos segundos</h2>
-        <p>Escolha seu nível e o tempo disponível.</p>
-      </div>
-
-      <div class="card">
-        <h3>Seu nível</h3>
-        <div class="options" id="levelOptions">
-          <button class="option active" data-level="iniciante">Iniciante</button>
-          <button class="option" data-level="intermediario">Intermediário</button>
-          <button class="option" data-level="avancado">Avançado</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Tempo disponível</h3>
-        <div class="options" id="durationOptions">
-          <button class="option active" data-duration="10">10 min</button>
-          <button class="option" data-duration="20">20 min</button>
-          <button class="option" data-duration="30">30 min</button>
-        </div>
-      </div>
-
-      <button id="generateBtn" class="primary-btn">GERAR MEU TREINO</button>
-    </section>
-
-    <section id="previewScreen" class="screen">
-      <div class="section-head">
-        <button class="back-btn" data-back="setupScreen">←</button>
-        <div>
-          <p class="eyebrow">TREINO DE HOJE</p>
-          <h2 id="previewTitle">Seu treino</h2>
-        </div>
-      </div>
-
-      <div id="workoutList" class="workout-list"></div>
-      <button id="startBtn" class="primary-btn">COMEÇAR TREINO</button>
-    </section>
-
-    <section id="workoutScreen" class="screen">
-      <div class="progress-wrap">
-        <div class="progress-info">
-          <span id="exerciseCounter">1 de 6</span>
-          <span id="totalElapsed">00:00</span>
-        </div>
-        <div class="progress-bar"><div id="progressFill"></div></div>
-      </div>
-
-      <div class="exercise-card">
-        <div id="exerciseEmoji" class="exercise-emoji">💪</div>
-        <p class="eyebrow" id="phaseLabel">EXERCÍCIO</p>
-        <h2 id="exerciseName">Agachamento</h2>
-        <p id="exerciseInstruction">Mantenha os pés afastados e desça com controle.</p>
-        <div id="timer" class="timer">30</div>
-        <p id="timerUnit">segundos</p>
-      </div>
-
-      <div class="workout-actions">
-        <button id="pauseBtn" class="secondary-btn">PAUSAR</button>
-        <button id="skipBtn" class="secondary-btn">PULAR</button>
-      </div>
-    </section>
-
-    <section id="finishScreen" class="screen">
-      <div class="finish-card">
-        <div class="finish-icon">🏆</div>
-        <p class="eyebrow">TREINO CONCLUÍDO</p>
-        <h2>Muito bem!</h2>
-        <p>Você terminou o treino de hoje.</p>
-
-        <div class="stats">
-          <div><strong id="finishTime">10 min</strong><span>Duração</span></div>
-          <div><strong id="finishCount">6</strong><span>Exercícios</span></div>
-          <div><strong id="finishStreak">1</strong><span>Sequência</span></div>
-        </div>
-
-        <button id="newWorkoutBtn" class="primary-btn">NOVO TREINO</button>
-      </div>
-    </section>
-
-    <section id="historyScreen" class="screen">
-      <div class="section-head">
-        <button class="back-btn" data-back="setupScreen">←</button>
-        <div>
-          <p class="eyebrow">SEU PROGRESSO</p>
-          <h2>Histórico</h2>
-        </div>
-      </div>
-      <div id="historyList" class="history-list"></div>
-      <button id="clearHistoryBtn" class="danger-btn">LIMPAR HISTÓRICO</button>
-    </section>
-  </main>
-
-  <script>
-
-const screens = document.querySelectorAll('.screen');
-let selectedLevel = 'iniciante';
-let selectedDuration = 10;
-let workout = [];
-let currentIndex = 0;
-let isRest = false;
-let timeLeft = 0;
-let intervalId = null;
-let totalSeconds = 0;
-let paused = false;
-
-const exerciseBank = {
-  iniciante: [
-    { name: 'Agachamento', emoji: '🦵', work: 30, rest: 20, instruction: 'Pés afastados. Desça devagar e mantenha o peito aberto.' },
-    { name: 'Flexão na parede', emoji: '🤲', work: 30, rest: 20, instruction: 'Apoie as mãos na parede e aproxime o peito com controle.' },
-    { name: 'Prancha com joelhos', emoji: '🧱', work: 25, rest: 20, instruction: 'Apoie os joelhos e mantenha o abdômen firme.' },
-    { name: 'Afundo alternado', emoji: '🚶', work: 30, rest: 20, instruction: 'Dê um passo para trás e alterne as pernas.' },
-    { name: 'Abdominal curto', emoji: '🔥', work: 25, rest: 20, instruction: 'Eleve apenas os ombros e não force o pescoço.' },
-    { name: 'Polichinelo leve', emoji: '⭐', work: 30, rest: 25, instruction: 'Abra braços e pernas em ritmo confortável.' }
-  ],
-  intermediario: [
-    { name: 'Agachamento', emoji: '🦵', work: 40, rest: 15, instruction: 'Desça até onde conseguir mantendo os joelhos alinhados.' },
-    { name: 'Flexão de braço', emoji: '💪', work: 35, rest: 20, instruction: 'Corpo reto, peito descendo entre as mãos.' },
-    { name: 'Prancha', emoji: '🧱', work: 40, rest: 15, instruction: 'Mantenha quadril alinhado e abdômen firme.' },
-    { name: 'Afundo alternado', emoji: '🚶', work: 40, rest: 15, instruction: 'Controle a descida e empurre o chão na subida.' },
-    { name: 'Escalador', emoji: '🏔️', work: 35, rest: 20, instruction: 'Leve os joelhos ao peito alternadamente.' },
-    { name: 'Burpee sem salto', emoji: '⚡', work: 35, rest: 25, instruction: 'Agache, leve os pés para trás e retorne sem salto.' }
-  ],
-  avancado: [
-    { name: 'Agachamento com salto', emoji: '🚀', work: 45, rest: 15, instruction: 'Aterrisse com suavidade e joelhos flexionados.' },
-    { name: 'Flexão de braço', emoji: '💪', work: 45, rest: 15, instruction: 'Faça o máximo com boa técnica, sem perder o alinhamento.' },
-    { name: 'Prancha com toque', emoji: '🧱', work: 45, rest: 15, instruction: 'Toque os ombros alternadamente sem girar o quadril.' },
-    { name: 'Afundo com salto', emoji: '🔥', work: 40, rest: 20, instruction: 'Alterne as pernas no ar e aterrisse com controle.' },
-    { name: 'Escalador rápido', emoji: '🏔️', work: 45, rest: 15, instruction: 'Mantenha o tronco firme e aumente o ritmo.' },
-    { name: 'Burpee completo', emoji: '⚡', work: 45, rest: 25, instruction: 'Desça, faça a prancha, retorne e finalize com salto.' }
-  ]
-};
-
-function showScreen(id) {
-  screens.forEach(screen => screen.classList.toggle('active', screen.id === id));
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-document.querySelectorAll('#levelOptions .option').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#levelOptions .option').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedLevel = btn.dataset.level;
-  });
-});
-
-document.querySelectorAll('#durationOptions .option').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#durationOptions .option').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedDuration = Number(btn.dataset.duration);
-  });
-});
-
-document.querySelectorAll('[data-back]').forEach(btn => {
-  btn.addEventListener('click', () => showScreen(btn.dataset.back));
-});
-
-document.getElementById('generateBtn').addEventListener('click', () => {
-  workout = buildWorkout(selectedLevel, selectedDuration);
-  renderPreview();
-  showScreen('previewScreen');
-});
-
-document.getElementById('startBtn').addEventListener('click', startWorkout);
-document.getElementById('pauseBtn').addEventListener('click', togglePause);
-document.getElementById('skipBtn').addEventListener('click', nextPhase);
-document.getElementById('newWorkoutBtn').addEventListener('click', () => showScreen('setupScreen'));
-document.getElementById('historyBtn').addEventListener('click', () => {
-  renderHistory();
-  showScreen('historyScreen');
-});
-document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-  localStorage.removeItem('calisthenicsHistory');
-  renderHistory();
-});
-
-function buildWorkout(level, duration) {
-  const base = exerciseBank[level];
-  const rounds = duration === 10 ? 1 : duration === 20 ? 2 : 3;
-  let result = [];
-  for (let r = 0; r < rounds; r++) {
-    result = result.concat(base.map(ex => ({ ...ex, round: r + 1 })));
-  }
-  return result;
-}
-
-function renderPreview() {
-  const labels = {
-    iniciante: 'Iniciante',
-    intermediario: 'Intermediário',
-    avancado: 'Avançado'
-  };
-  document.getElementById('previewTitle').textContent = `${selectedDuration} min • ${labels[selectedLevel]}`;
-  document.getElementById('workoutList').innerHTML = workout.map((ex, index) => `
-    <div class="workout-item">
-      <div class="emoji">${ex.emoji}</div>
-      <div>
-        <h3>${ex.name}</h3>
-        <p>Rodada ${ex.round}</p>
-      </div>
-      <strong>${ex.work}s</strong>
+    <div class="hero">
+      <span class="hero-badge">100% sem equipamentos</span>
+      <h2>Treine em casa, no seu ritmo.</h2>
+      <p class="muted">Escolha uma categoria e comece em poucos segundos.</p>
     </div>
-  `).join('');
+    <div class="quick-grid">
+      <button class="quick-card" onclick="openWorkout('completo')"><span>⚡</span><strong>Treino rápido</strong><span>Corpo inteiro</span></button>
+      <button class="quick-card" onclick="goTo('historyScreen','history')"><span>🔥</span><strong id="streakQuick">0 dias</strong><span>Sua sequência</span></button>
+    </div>
+    <div class="section-title"><div><p class="eyebrow">PROGRAMAS</p><h2>Escolha seu treino</h2></div><p>5 opções</p></div>
+    <div class="chips">
+      <button class="chip active" data-filter="todos">▦ Todos</button>
+      <button class="chip" data-filter="iniciante">Iniciante</button>
+      <button class="chip" data-filter="intermediario">Intermediário</button>
+      <button class="chip" data-filter="avancado">Avançado</button>
+    </div>
+    <div class="search-box"><input id="searchInput" placeholder="Buscar treino..."><span>⌕</span></div>
+    <div class="workout-list" id="workoutCards"></div>
+  </section>
+
+  <section class="screen" id="detailScreen">
+    <header class="header">
+      <button class="icon-btn" onclick="goTo('homeScreen','training')">←</button>
+      <div class="header-center"><p class="eyebrow">DETALHES</p><h2 id="detailHeader">Treino</h2></div>
+      <button class="icon-btn" onclick="goTo('homeScreen','training')">⌂</button>
+    </header>
+    <div class="detail-hero card" id="detailHero"></div>
+    <div class="section-title"><h2>Exercícios</h2><p id="exerciseAmount"></p></div>
+    <div class="exercise-list" id="detailExercises"></div>
+    <button class="primary" onclick="startSelectedWorkout()">COMEÇAR TREINO</button>
+  </section>
+
+  <section class="screen" id="exerciseLibraryScreen">
+    <header class="header"><div><p class="eyebrow">BIBLIOTECA</p><h1>Exercícios</h1></div><button class="icon-btn">⌕</button></header>
+    <div class="exercise-list" id="exerciseLibrary"></div>
+  </section>
+
+  <section class="screen" id="workoutScreen">
+    <header class="header">
+      <button class="icon-btn home-btn" onclick="exitWorkout()">⌂ <span>INÍCIO</span></button>
+      <div class="header-center"><h2>Calistenia em Casa</h2><p class="eyebrow" id="workoutSubtitle">TREINO</p></div>
+      <button class="icon-btn" onclick="restartWorkout()">↻</button>
+    </header>
+    <div class="progress-head"><span id="exerciseCounter">1 de 8</span><span id="elapsed">00:00</span></div>
+    <div class="progress"><div id="progressBar" style="width:0"></div></div>
+    <div class="exercise-panel">
+      <div class="big-icon" id="bigIcon">💪</div>
+      <p class="eyebrow" id="phase">EXERCÍCIO</p>
+      <h2 id="exerciseName">Flexão</h2>
+      <p class="description" id="instruction"></p>
+      <div class="timer" id="timer">30</div>
+      <div class="timer-label">segundos</div>
+    </div>
+    <div class="actions">
+      <button class="workout-action" id="pauseBtn" onclick="togglePause()">Ⅱ PAUSAR</button>
+      <button class="workout-action" onclick="nextPhase()">≫ PULAR</button>
+    </div>
+    <button class="workout-action restart" onclick="restartWorkout()">↻ RECOMEÇAR TREINO</button>
+  </section>
+
+  <section class="screen" id="finishScreen">
+    <div class="finish-card">
+      <div class="finish-icon">🏆</div><p class="eyebrow">TREINO CONCLUÍDO</p><h2>Mandou bem!</h2>
+      <p class="muted">Seu progresso foi salvo neste aparelho.</p>
+      <div class="stats"><div><strong id="finishTime">00:00</strong><span>Tempo</span></div><div><strong id="finishExercises">0</strong><span>Exercícios</span></div><div><strong id="finishStreak">1</strong><span>Sequência</span></div></div>
+      <button class="primary" onclick="goTo('homeScreen','training')">VOLTAR AO INÍCIO</button>
+    </div>
+  </section>
+
+  <section class="screen" id="historyScreen">
+    <header class="header"><div><p class="eyebrow">SEU PROGRESSO</p><h1>Histórico</h1></div><button class="icon-btn" onclick="clearHistory()">⌫</button></header>
+    <div class="history-list" id="historyList"></div>
+  </section>
+
+  <section class="screen" id="profileScreen">
+    <header class="header"><div><p class="eyebrow">CONFIGURAÇÕES</p><h1>Perfil</h1></div></header>
+    <div class="profile-card"><div class="avatar">💪</div><h2>Seu treino, seus dados</h2><p class="muted">Não há cadastro. Todo o histórico fica apenas neste aparelho.</p></div>
+  </section>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-button active" data-nav="training" onclick="goTo('homeScreen','training')"><span>🏋️</span>Treino</button>
+  <button class="nav-button" data-nav="exercises" onclick="goTo('exerciseLibraryScreen','exercises')"><span>☷</span>Exercícios</button>
+  <button class="nav-button" data-nav="history" onclick="goTo('historyScreen','history')"><span>▥</span>Histórico</button>
+  <button class="nav-button" data-nav="profile" onclick="goTo('profileScreen','profile')"><span>♙</span>Perfil</button>
+</nav>
+
+<script>
+const workouts={
+ completo:{title:'Treino Completo',level:'intermediario',duration:'20–30 min',description:'Corpo inteiro • força e condicionamento',icons:['🤸','💪','🦵','🔥'],exercises:[
+  ['Agachamento','🦵',40,15,'Pés afastados; desça com controle e mantenha o peito aberto.'],
+  ['Flexão de braço','💪',35,20,'Mantenha o corpo alinhado e aproxime o peito do chão.'],
+  ['Afundo alternado','🚶',40,15,'Dê um passo para trás e alterne as pernas.'],
+  ['Prancha','🧱',35,15,'Contraia o abdômen e mantenha o quadril alinhado.'],
+  ['Escalador','🏔️',35,20,'Leve os joelhos ao peito de forma alternada.'],
+  ['Ponte de glúteos','🌉',40,15,'Eleve o quadril contraindo os glúteos.'],
+  ['Abdominal bicicleta','🚲',35,15,'Alterne cotovelo e joelho sem puxar o pescoço.'],
+  ['Polichinelo','⭐',40,20,'Abra braços e pernas em ritmo confortável.']]},
+ peito:{title:'Peito e Tríceps',level:'intermediario',duration:'15–25 min',description:'Peito forte e tríceps definidos',icons:['💪','🤲','⬇️','🔥'],exercises:[
+  ['Flexão inclinada','🤲',40,20,'Use uma superfície firme e mantenha o corpo alinhado.'],
+  ['Flexão tradicional','💪',35,20,'Desça o peito entre as mãos com controle.'],
+  ['Flexão aberta','↔️',35,20,'Posicione as mãos um pouco além dos ombros.'],
+  ['Flexão fechada','♦️',30,20,'Aproxime as mãos para aumentar o trabalho do tríceps.'],
+  ['Mergulho na cadeira','🪑',35,20,'Use uma cadeira firme e flexione os cotovelos.'],
+  ['Prancha sobe e desce','🧱',35,20,'Alterne entre mãos e antebraços sem girar o quadril.']]},
+ costas:{title:'Costas e Bíceps',level:'intermediario',duration:'15–25 min',description:'Postura, costas e braços mais fortes',icons:['🦅','🏊','💪','🧍'],exercises:[
+  ['Superman','🦸',40,15,'Eleve braços e pernas mantendo o olhar para o chão.'],
+  ['Anjo invertido','🪽',35,15,'De bruços, mova os braços lentamente pelas laterais.'],
+  ['Remada com toalha','🧻',35,20,'Puxe a toalha com força em sentidos opostos.'],
+  ['Prancha com remada','🧱',35,20,'Retire uma mão do chão por vez sem girar o tronco.'],
+  ['Rosca isométrica','💪',40,15,'Pressione uma mão contra a outra simulando uma rosca.'],
+  ['Nadador','🏊',35,15,'Alterne braços e pernas deitado de barriga para baixo.']]},
+ ombros:{title:'Ombros e Abdômen',level:'intermediario',duration:'15–25 min',description:'Ombros fortes e abdômen estável',icons:['🙆','🧱','🔥','↔️'],exercises:[
+  ['Flexão pike','🔺',35,20,'Eleve o quadril e direcione a cabeça ao chão.'],
+  ['Prancha com toque','🧱',40,15,'Toque os ombros sem balançar o quadril.'],
+  ['Elevação lateral isométrica','🙆',35,15,'Mantenha os braços abertos e firmes.'],
+  ['Abdominal curto','🔥',35,15,'Eleve os ombros e não force o pescoço.'],
+  ['Prancha lateral','↔️',30,15,'Mantenha o corpo alinhado apoiado em um antebraço.'],
+  ['Elevação de pernas','⬆️',35,20,'Eleve as pernas sem tirar a lombar do chão.']]},
+ pernas:{title:'Pernas e Glúteos',level:'iniciante',duration:'15–25 min',description:'Pernas fortes, equilíbrio e glúteos',icons:['🦵','🍑','🚶','⬆️'],exercises:[
+  ['Agachamento','🦵',40,15,'Desça com controle e mantenha os joelhos alinhados.'],
+  ['Afundo alternado','🚶',40,15,'Dê um passo para trás e alterne as pernas.'],
+  ['Agachamento sumô','🤼',40,15,'Abra mais os pés e aponte os joelhos para fora.'],
+  ['Ponte de glúteos','🌉',40,15,'Eleve o quadril e aperte os glúteos no topo.'],
+  ['Elevação de panturrilha','⬆️',40,15,'Suba na ponta dos pés e desça devagar.'],
+  ['Abdução lateral','↗️',35,15,'Eleve a perna lateralmente mantendo o tronco firme.']]}
+};
+let selectedKey='completo',current=[],index=0,isRest=false,timeLeft=0,total=0,timerId=null,paused=false,currentFilter='todos';
+
+function posterHTML(w,large=false){
+ const icons=(large?[...w.icons,...w.icons]:w.icons);
+ return `<div class="poster"><div class="poster-title">${w.title.toUpperCase()}</div><div class="poster-grid">${icons.map(i=>`<div>${i}</div>`).join('')}</div></div>`;
 }
-
-function startWorkout() {
-  currentIndex = 0;
-  isRest = false;
-  totalSeconds = 0;
-  paused = false;
-  clearInterval(intervalId);
-  showScreen('workoutScreen');
-  loadPhase();
-  intervalId = setInterval(tick, 1000);
+function renderCards(){
+ const q=document.getElementById('searchInput').value.toLowerCase();
+ const box=document.getElementById('workoutCards');
+ box.innerHTML=Object.entries(workouts).filter(([k,w])=>(currentFilter==='todos'||w.level===currentFilter)&&w.title.toLowerCase().includes(q)).map(([k,w])=>`
+ <button class="workout-card" onclick="openWorkout('${k}')">
+ ${posterHTML(w)}<div class="workout-info"><h3>${w.title}</h3><span class="tag">SEM EQUIPAMENTO</span><p>${w.description}</p><div class="meta"><span>◷ ${w.duration}</span><span>▥ ${labelLevel(w.level)}</span></div></div><span class="arrow">›</span></button>`).join('');
 }
-
-function loadPhase() {
-  const ex = workout[currentIndex];
-  document.getElementById('exerciseCounter').textContent = `${currentIndex + 1} de ${workout.length}`;
-  document.getElementById('progressFill').style.width = `${(currentIndex / workout.length) * 100}%`;
-
-  if (isRest) {
-    document.getElementById('phaseLabel').textContent = 'DESCANSO';
-    document.getElementById('exerciseName').textContent = 'Respire e prepare-se';
-    document.getElementById('exerciseInstruction').textContent =
-      currentIndex < workout.length - 1 ? `Próximo: ${workout[currentIndex + 1].name}` : 'Último descanso';
-    document.getElementById('exerciseEmoji').textContent = '⏸️';
-    timeLeft = ex.rest;
-  } else {
-    document.getElementById('phaseLabel').textContent = 'EXERCÍCIO';
-    document.getElementById('exerciseName').textContent = ex.name;
-    document.getElementById('exerciseInstruction').textContent = ex.instruction;
-    document.getElementById('exerciseEmoji').textContent = ex.emoji;
-    timeLeft = ex.work;
-  }
-
-  updateTimer();
+function labelLevel(v){return {iniciante:'Iniciante',intermediario:'Intermediário',avancado:'Avançado'}[v]||v}
+function openWorkout(key){
+ selectedKey=key;const w=workouts[key];document.getElementById('detailHeader').textContent=w.title;
+ document.getElementById('detailHero').innerHTML=`${posterHTML(w,true)}<h2>${w.title}</h2><span class="tag">SEM EQUIPAMENTO</span><p class="muted">${w.description}</p><div class="meta"><span>◷ ${w.duration}</span><span>▥ ${labelLevel(w.level)}</span></div>`;
+ document.getElementById('exerciseAmount').textContent=`${w.exercises.length} exercícios`;
+ document.getElementById('detailExercises').innerHTML=w.exercises.map((e,i)=>exerciseRow(e,i)).join('');
+ goTo('detailScreen','training');
 }
-
-function tick() {
-  if (paused) return;
-  totalSeconds++;
-  document.getElementById('totalElapsed').textContent = formatTime(totalSeconds);
-  timeLeft--;
-  updateTimer();
-  if (timeLeft <= 0) nextPhase();
+function exerciseRow(e,i){return `<div class="exercise-row"><div class="exercise-illustration">${e[1]}</div><div><h3>${i+1}. ${e[0]}</h3><p>${e[4]}</p></div><strong>${e[2]}s</strong></div>`}
+function renderLibrary(){
+ let all=[];Object.values(workouts).forEach(w=>w.exercises.forEach(e=>{if(!all.some(a=>a[0]===e[0]))all.push(e)}));
+ document.getElementById('exerciseLibrary').innerHTML=all.map((e,i)=>exerciseRow(e,i)).join('');
 }
-
-function nextPhase() {
-  if (!isRest) {
-    isRest = true;
-    loadPhase();
-  } else {
-    currentIndex++;
-    isRest = false;
-    if (currentIndex >= workout.length) finishWorkout();
-    else loadPhase();
-  }
+function goTo(id,nav){
+ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+ document.querySelectorAll('.nav-button').forEach(b=>b.classList.toggle('active',b.dataset.nav===nav));
+ document.getElementById('bottomNav').style.display=(id==='workoutScreen'||id==='finishScreen')?'none':'grid';
+ if(id==='historyScreen')renderHistory();window.scrollTo(0,0);
 }
-
-function togglePause() {
-  paused = !paused;
-  document.getElementById('pauseBtn').textContent = paused ? 'CONTINUAR' : 'PAUSAR';
+function startSelectedWorkout(){
+ current=workouts[selectedKey].exercises.map(e=>[...e]);index=0;isRest=false;total=0;paused=false;
+ document.getElementById('pauseBtn').textContent='Ⅱ PAUSAR';
+ document.getElementById('workoutSubtitle').textContent=workouts[selectedKey].title.toUpperCase();
+ clearInterval(timerId);goTo('workoutScreen','training');loadPhase();timerId=setInterval(tick,1000);
 }
-
-function updateTimer() {
-  document.getElementById('timer').textContent = Math.max(0, timeLeft);
+function loadPhase(){
+ const e=current[index];document.getElementById('exerciseCounter').textContent=`${index+1} de ${current.length}`;
+ document.getElementById('progressBar').style.width=`${(index/current.length)*100}%`;
+ if(isRest){document.getElementById('phase').textContent='DESCANSO';document.getElementById('exerciseName').textContent='Respire e prepare-se';document.getElementById('instruction').textContent=index<current.length-1?`Próximo: ${current[index+1][0]}`:'Último descanso';document.getElementById('bigIcon').textContent='Ⅱ';timeLeft=e[3]}
+ else{document.getElementById('phase').textContent='EXERCÍCIO';document.getElementById('exerciseName').textContent=e[0];document.getElementById('instruction').textContent=e[4];document.getElementById('bigIcon').textContent=e[1];timeLeft=e[2]}
+ updateTimer();
 }
-
-function finishWorkout() {
-  clearInterval(intervalId);
-  document.getElementById('progressFill').style.width = '100%';
-  const history = JSON.parse(localStorage.getItem('calisthenicsHistory') || '[]');
-  const entry = {
-    date: new Date().toISOString(),
-    level: selectedLevel,
-    duration: selectedDuration,
-    exercises: workout.length,
-    elapsed: totalSeconds
-  };
-  history.unshift(entry);
-  localStorage.setItem('calisthenicsHistory', JSON.stringify(history.slice(0, 50)));
-
-  document.getElementById('finishTime').textContent = formatTime(totalSeconds);
-  document.getElementById('finishCount').textContent = workout.length;
-  document.getElementById('finishStreak').textContent = calculateStreak(history);
-  showScreen('finishScreen');
+function tick(){if(paused)return;total++;document.getElementById('elapsed').textContent=format(total);timeLeft--;updateTimer();if(timeLeft<=0)nextPhase()}
+function updateTimer(){document.getElementById('timer').textContent=Math.max(0,timeLeft)}
+function nextPhase(){if(!isRest){isRest=true;loadPhase()}else{index++;isRest=false;if(index>=current.length)finishWorkout();else loadPhase()}}
+function togglePause(){paused=!paused;document.getElementById('pauseBtn').textContent=paused?'▶ CONTINUAR':'Ⅱ PAUSAR'}
+function restartWorkout(){if(!current.length)return;if(confirm('Recomeçar este treino desde o início?')){index=0;isRest=false;total=0;paused=false;document.getElementById('elapsed').textContent='00:00';loadPhase()}}
+function exitWorkout(){if(confirm('Deseja voltar ao início? O treino atual será encerrado.')){clearInterval(timerId);current=[];goTo('homeScreen','training')}}
+function finishWorkout(){
+ clearInterval(timerId);const history=JSON.parse(localStorage.getItem('calisthenicsHistory')||'[]');
+ history.unshift({date:new Date().toISOString(),title:workouts[selectedKey].title,exercises:current.length,elapsed:total});
+ localStorage.setItem('calisthenicsHistory',JSON.stringify(history.slice(0,60)));
+ document.getElementById('finishTime').textContent=format(total);document.getElementById('finishExercises').textContent=current.length;document.getElementById('finishStreak').textContent=streak(history);
+ updateQuick();goTo('finishScreen','training');
 }
-
-function calculateStreak(history) {
-  const uniqueDays = [...new Set(history.map(item => item.date.slice(0, 10)))].sort().reverse();
-  if (!uniqueDays.length) return 0;
-
-  let streak = 1;
-  let current = new Date(uniqueDays[0] + 'T12:00:00');
-  for (let i = 1; i < uniqueDays.length; i++) {
-    const next = new Date(uniqueDays[i] + 'T12:00:00');
-    const diff = Math.round((current - next) / 86400000);
-    if (diff === 1) {
-      streak++;
-      current = next;
-    } else {
-      break;
-    }
-  }
-  return streak;
+function streak(history){
+ const days=[...new Set(history.map(h=>h.date.slice(0,10)))].sort().reverse();if(!days.length)return 0;let n=1,d=new Date(days[0]+'T12:00:00');
+ for(let i=1;i<days.length;i++){const x=new Date(days[i]+'T12:00:00'),diff=Math.round((d-x)/86400000);if(diff===1){n++;d=x}else break}return n
 }
-
-function renderHistory() {
-  const history = JSON.parse(localStorage.getItem('calisthenicsHistory') || '[]');
-  const container = document.getElementById('historyList');
-
-  if (!history.length) {
-    container.innerHTML = '<div class="empty">Você ainda não concluiu nenhum treino.</div>';
-    return;
-  }
-
-  const labels = {
-    iniciante: 'Iniciante',
-    intermediario: 'Intermediário',
-    avancado: 'Avançado'
-  };
-
-  container.innerHTML = history.map(item => {
-    const date = new Date(item.date);
-    return `
-      <div class="history-item">
-        <div class="row">
-          <div>
-            <h3>${labels[item.level]} • ${item.duration} min</h3>
-            <p>${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</p>
-          </div>
-          <strong>${item.exercises} exercícios</strong>
-        </div>
-      </div>
-    `;
-  }).join('');
+function renderHistory(){
+ const h=JSON.parse(localStorage.getItem('calisthenicsHistory')||'[]'),box=document.getElementById('historyList');
+ box.innerHTML=h.length?h.map(x=>`<div class="history-item"><div class="row"><div><h3>${x.title}</h3><p>${new Date(x.date).toLocaleDateString('pt-BR')} • ${format(x.elapsed)}</p></div><strong>${x.exercises} exercícios</strong></div></div>`).join(''):'<div class="empty">Nenhum treino concluído ainda.</div>'
 }
-
-function formatTime(seconds) {
-  const min = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const sec = String(seconds % 60).padStart(2, '0');
-  return `${min}:${sec}`;
-}
-
-
+function clearHistory(){if(confirm('Apagar todo o histórico?')){localStorage.removeItem('calisthenicsHistory');renderHistory();updateQuick()}}
+function updateQuick(){const h=JSON.parse(localStorage.getItem('calisthenicsHistory')||'[]');document.getElementById('streakQuick').textContent=`${streak(h)} dias`}
+function format(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');currentFilter=c.dataset.filter;renderCards()});
+document.getElementById('searchInput').addEventListener('input',renderCards);
+renderCards();renderLibrary();updateQuick();
 </script>
 </body>
 </html>
